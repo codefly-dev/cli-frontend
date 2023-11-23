@@ -1,0 +1,25 @@
+{
+  "usage": {
+    "base": "codefly.ai/redis",
+    "uses": [
+      {
+        "project": "default",
+        "application": "guestbook-go",
+        "unique": "marketplace.cache",
+        "version": "0.0.1"
+      },
+      {
+        "project": "codefly.ai",
+        "application": "marketplace",
+        "unique": "marketplace.cache",
+        "version": "0.0.1"
+      },
+      {
+        "project": "codefly.ai",
+        "application": "platform",
+        "unique": "marketplace.cache",
+        "version": "0.0.1"
+      }
+    ]
+  }
+}

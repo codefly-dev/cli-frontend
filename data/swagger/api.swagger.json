@@ -1,0 +1,256 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Web"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/application/trackers": {
+      "get": {
+        "operationId": "Web_Trackers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webTrackersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Web"
+        ]
+      }
+    },
+    "/application/view": {
+      "get": {
+        "operationId": "Web_ApplicationView",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/webApplicationViewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Web"
+        ]
+      }
+    },
+    "/services/information": {
+      "get": {
+        "operationId": "Web_ServiceInformation",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/webServiceInformationResponse"
+                },
+                "error": {
+                  "$ref": "#/definitions/rpcStatus"
+                }
+              },
+              "title": "Stream result of webServiceInformationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "Web"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1DockerTracker": {
+      "type": "object",
+      "properties": {
+        "containerId": {
+          "type": "string"
+        }
+      }
+    },
+    "v1ProcessTracker": {
+      "type": "object",
+      "properties": {
+        "PID": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "v1Tracker": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "processTracker": {
+          "$ref": "#/definitions/v1ProcessTracker"
+        },
+        "dockerTracker": {
+          "$ref": "#/definitions/v1DockerTracker"
+        }
+      }
+    },
+    "v1TrackerList": {
+      "type": "object",
+      "properties": {
+        "trackers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Tracker"
+          }
+        }
+      }
+    },
+    "v1Trackers": {
+      "type": "object",
+      "properties": {
+        "trackers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1TrackerList"
+          }
+        }
+      }
+    },
+    "webApplicationView": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webServiceView"
+          }
+        }
+      }
+    },
+    "webApplicationViewResponse": {
+      "type": "object",
+      "properties": {
+        "application": {
+          "$ref": "#/definitions/webApplicationView"
+        }
+      }
+    },
+    "webEndpointView": {
+      "type": "object",
+      "properties": {
+        "dns": {
+          "type": "string"
+        }
+      }
+    },
+    "webServiceInformation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "webServiceInformationResponse": {
+      "type": "object",
+      "properties": {
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webServiceInformation"
+          }
+        }
+      }
+    },
+    "webServiceView": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/webEndpointView"
+          }
+        }
+      }
+    },
+    "webTrackersResponse": {
+      "type": "object",
+      "properties": {
+        "trackers": {
+          "$ref": "#/definitions/v1Trackers"
+        }
+      }
+    }
+  }
+}
