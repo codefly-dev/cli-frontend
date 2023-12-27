@@ -1,112 +1,170 @@
-import {
-  Container,
-  Flex,
-  Grid,
-  GridItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
-import { useState } from "react";
-import useSWR from "swr";
-
-import { ErrorCard } from "@/components/error-card";
-import type { Service, ServiceInformation } from "@/types";
+import { Dialog, DialogTitle } from "@/components/dialog";
+import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
+import type { Service, ServiceDependencies } from "@/types";
+import { useColorMode } from "@chakra-ui/react";
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import protobuf from "react-syntax-highlighter/dist/esm/languages/hljs/protobuf";
+import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
+import { useActiveProject } from "../use-active-project";
 import { API_URL } from "@/utils/constants";
-import { DeploymentList } from "./deployment-list";
-import { EndpointList } from "./endpoint-list";
-import { PluginModal } from "./plugin-modal";
-import Link from "next/link";
+import useSWR from "swr";
+import { ArrowBackIcon } from "@chakra-ui/icons";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { Fragment } from "react";
+
+SyntaxHighlighter.registerLanguage("protobuf", protobuf);
 
 export function ServiceModal({
-  service,
+  applicationId,
+  serviceId,
   open,
   onClose,
-  projectId,
-  applicationId,
+  previewService,
+  previewAgent,
+  undoPreviewHistory,
 }: {
-  service: Service | null;
+  applicationId?: string;
+  serviceId?: string;
   open: boolean;
-  onClose: () => void;
-  projectId: string;
-  applicationId: string;
+  onClose(): void;
+  previewService?(service: `${string}/${string}`): void;
+  previewAgent?(agent: `${string}/${string}`): void;
+  undoPreviewHistory?(): void;
 }) {
-  const [pluginShown, setPluginShown] = useState(false);
-  const { colorMode } = useColorMode();
-  const {
-    data: serviceInformation,
-    error,
-    isLoading: loading,
-  } = useSWR<ServiceInformation>(
-    `/project/${projectId}/application/${applicationId}/service/${service?.unique}/information`,
-    (url) => fetch(API_URL + url).then((res) => res.json())
+  const { project } = useActiveProject();
+
+  const service = project?.applications
+    ?.find((a) => a.name === applicationId)
+    ?.services?.find((s) => s.name === serviceId);
+
+  const { data: serviceDependencies } = useSWR<ServiceDependencies>(
+    `/overall/project/${project?.name}/service-dependency-graph`,
+    (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
-  if (error) {
-    return (
-      <Container maxW="5xl" my={5} h="60vh">
-        <ErrorCard message={error?.message} />
-      </Container>
-    );
-  }
+  const dependsOn = serviceDependencies?.edges
+    .filter((edge) => edge.to === `${service?.application}/${service?.name}`)
+    .map((edge) => edge.from);
+
+  const requiredBy = serviceDependencies?.edges
+    .filter((edge) => edge.from === `${service?.application}/${service?.name}`)
+    .map((edge) => edge.to);
 
   return (
     <>
-      <Modal isOpen={open} onClose={onClose} isCentered>
-        <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(3px)" />
+      <Dialog
+        open={open && !!service}
+        onOpenChange={(open) => !open && onClose()}
+        className="!max-w-[800px]"
+      >
         {!!service && (
-          <ModalContent color={`text.${colorMode}`} bg={`bg.${colorMode}`}>
-            <PluginModal
-              base={service.base.split(":")[0]}
-              open={pluginShown}
-              onClose={() => setPluginShown(false)}
-            />
+          <>
+            <div className="flex gap-2">
+              {!!undoPreviewHistory && (
+                <button className="cursor-pointer" onClick={undoPreviewHistory}>
+                  <ArrowLeftIcon className="w-5 h-5" />
+                </button>
+              )}
 
-            <ModalHeader>{service.name}</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody mb={4}>
-              <Flex flexDir="column" gap={4}>
-                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                  <GridItem>
-                    <Text color={`textMuted.${colorMode}`}>Base</Text>
+              <DialogTitle>
+                {service.application}/{service.name}
+              </DialogTitle>
+            </div>
 
-                    <Link
-                      href={`/plugin?publisher=${
-                        service.base.split(":")[0].split("/")[0]
-                      }&name=${service.base.split(":")[0].split("/")[1]}`}
-                    >
-                      <Text
-                        cursor="pointer"
-                        textDecor="underline"
-                        // onClick={() => setPluginShown(true)}
-                      >
-                        {service.base}
-                      </Text>
-                    </Link>
-                  </GridItem>
+            <div className="flex flex-col">
+              <span
+                className="underline cursor-pointer"
+                onClick={(event) => {
+                  event?.stopPropagation();
+                  previewAgent?.(
+                    `${service.agent.name}/${service.agent.version}`
+                  );
+                }}
+              >
+                {service.agent.name}:{service.agent.version}
+              </span>
 
-                  <GridItem>
-                    <Text color={`textMuted.${colorMode}`}>Version</Text>
-                    <Text>{service.version || "N/A"}</Text>
-                  </GridItem>
-                </Grid>
+              <span className="text-sm text-neutral-500">
+                {service.description}
+              </span>
+            </div>
 
-                <EndpointList service={service} />
+            <div className="flex flex-col gap-2 mt-4">
+              {[
+                { title: "Depends on", list: dependsOn },
+                { title: "Required by", list: requiredBy },
+              ].map((group) => (
+                <Fragment key={group.title}>
+                  <div className="flex flex-col">
+                    <span className="text-neutral-500">{group.title}:</span>
+                    <div className="flex flex-col">
+                      {group.list?.length ? (
+                        group.list?.map((v) => (
+                          <span
+                            key={v}
+                            className="underline cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              previewService?.(v);
+                            }}
+                          >
+                            {v}
+                          </span>
+                        ))
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </div>
+                  </div>
+                </Fragment>
+              ))}
+            </div>
 
-                <DeploymentList
-                  deployments={serviceInformation?.deployments ?? []}
-                  loading={loading}
-                />
-              </Flex>
-            </ModalBody>
-          </ModalContent>
+            {service.endpoints.length > 0 && (
+              <div className="flex flex-col mt-6">
+                <h4 className="text-lg font-semibold">
+                  Endpoint
+                  {service.endpoints.length !== 1 && "s"} (
+                  {service.endpoints.length})
+                </h4>
+                <Tabs defaultValue={service.endpoints[0].name}>
+                  {/* <SwaggerUI /> */}
+                  <TabList>
+                    {service.endpoints.map((endpoint, idx) => (
+                      <Tab key={idx} value={endpoint.name}>
+                        {endpoint.name}
+                      </Tab>
+                    ))}
+                  </TabList>
+                  {service.endpoints.map((endpoint, idx) => (
+                    <TabContent key={idx} value={endpoint.name}>
+                      {endpoint.name === "rest" ? (
+                        <SwaggerUI
+                          spec={atob(endpoint.api.rest.openapi)}
+                          requestInterceptor={(req) => {
+                            const url = new URL(req.url);
+                            req.url = "http://localhost:11331" + url.pathname;
+
+                            return req;
+                          }}
+                        />
+                      ) : (
+                        <div className="p-4 mt-3 rounded-xl bg-gray-50 border border-gray-200">
+                          <SyntaxHighlighter language="protobuf" style={docco}>
+                            {atob(endpoint.api.grpc.proto)}
+                          </SyntaxHighlighter>
+                        </div>
+                      )}
+                    </TabContent>
+                  ))}
+                </Tabs>
+              </div>
+            )}
+          </>
         )}
-      </Modal>
+      </Dialog>
     </>
   );
 }

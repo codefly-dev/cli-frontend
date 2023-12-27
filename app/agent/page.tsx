@@ -3,20 +3,21 @@
 import { ErrorCard } from "@/components/error-card";
 import { Container } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
-import { PluginPage } from "./plugin-page";
+import { AgentPage } from "./agent-page";
 
 export default function Page() {
   const searchParams = useSearchParams();
-  const publisher = searchParams?.get("publisher");
+  // const publisher = searchParams?.get("publisher");
   const name = searchParams?.get("name");
+  const version = searchParams?.get("version");
 
-  if (!publisher || !name) {
+  if (!version || !name) {
     return (
       <Container maxW="5xl" my={5} h="60vh">
-        <ErrorCard message={"Plugin publisher or name not defined in URL"} />
+        <ErrorCard message={"Agent version or name not defined in URL"} />
       </Container>
     );
   }
 
-  return <PluginPage publisher={publisher} name={name} />;
+  return <AgentPage version={version} name={name} />;
 }

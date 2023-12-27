@@ -1,22 +1,20 @@
-import { Box, type BoxProps, useColorMode } from "@chakra-ui/react";
+import clsx from "clsx";
 import { PropsWithChildren } from "react";
 
-export function Card({ children, ...props }: BoxProps) {
-  const { colorMode } = useColorMode();
+export function Card({
+  children,
+  className,
+  ...props
+}: PropsWithChildren<{ className?: string }>) {
   return (
-    <Box
-      w="100%"
-      h="100%"
-      borderRadius="xl"
-      border="1px solid"
-      borderColor={`border.${colorMode}`}
-      bg={`bgLayer.${colorMode}`}
-      // _hover={{ opacity: 0.8 }}
-      boxShadow="sm"
-      padding={4}
+    <div
+      className={clsx(
+        "w-full h-full rounded-xl border border-neutral-100 bg-white shadow-sm p-4",
+        className
+      )}
       {...props}
     >
       {children}
-    </Box>
+    </div>
   );
 }

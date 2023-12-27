@@ -1,174 +1,195 @@
-import {
-  Box,
-  Container,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Spinner,
-  Tab,
-  TabIndicator,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  useColorMode,
-} from "@chakra-ui/react";
-import { useState } from "react";
-import useSWR from "swr";
-
 import { BreadcrumbLink } from "@/components/breadcrumb-link";
-import { Button } from "@/components/button";
 import { ErrorCard } from "@/components/error-card";
 import { Skeleton } from "@/components/skeleton";
-import type { Application, Service } from "@/types";
-import { option } from "fp-ts";
-import { pipe } from "fp-ts/function";
-import { ServiceCard } from "./service-card";
+import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
+import type { Application, ServiceDependencies } from "@/types";
 import { API_URL } from "@/utils/constants";
+import clsx from "clsx";
+import { useState } from "react";
+import useSWR from "swr";
+import { AgentModal } from "../agent/agent-modal";
+import { ProjectLogs } from "../project-logs";
+import { useActiveProject } from "../use-active-project";
+import { ServiceCard } from "./service-card";
 import { ServiceModal } from "./service-modal";
 
-export function ApplicationPage({
-  applicationId,
-  projectId,
-}: {
-  applicationId: string;
-  projectId: string;
-}) {
-  const [lastSynced, setLastSynced] = useState<Date | null>(null);
-  const {
-    data,
-    error,
-    isLoading: loading,
-  } = useSWR<{ application: Application }>(
-    [`/application/${applicationId}/information`, lastSynced],
-    ([url]) => fetch(API_URL + url).then((res) => res.json())
+export function ApplicationPage({ applicationId }: { applicationId: string }) {
+  const { project, error, isLoading: loading } = useActiveProject();
+  const { data: serviceDependencies } = useSWR<ServiceDependencies>(
+    `/overall/project/${project?.name}/service-dependency-graph`,
+    (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
   if (error) {
     return (
-      <Container maxW="5xl" my={5} h="60vh">
+      <div className="h-[60vh] cli-container">
         <ErrorCard message={error?.message} />
-      </Container>
+      </div>
     );
   }
 
-  const application = option.fromNullable(data?.application);
+  const application = project?.applications?.find(
+    (a) => a.name === applicationId
+  );
 
   return (
     <AppServices
       application={application}
-      projectId={projectId}
+      serviceDependencies={serviceDependencies}
       loading={loading}
-      onSync={() => setLastSynced(new Date())}
     />
   );
 }
 
 const AppServices = ({
   application,
-  projectId,
+  serviceDependencies,
   loading,
-  onSync,
 }: {
-  application: option.Option<Application>;
-  projectId: string;
+  application?: Application;
+  serviceDependencies?: ServiceDependencies;
   loading: boolean;
-  onSync: () => void;
 }) => {
-  const { colorMode } = useColorMode();
-  const [activeService, setActiveService] = useState<Service | null>(null);
+  const [previewHistory, setPreviewHistory] = useState<
+    { type: "agent" | "service"; id: `${string}/${string}` }[]
+  >([]);
+
+  const preview = previewHistory.length
+    ? previewHistory?.[previewHistory.length - 1]
+    : null;
+
+  const undoPreviewHistory =
+    previewHistory?.length > 1
+      ? () => {
+          setPreviewHistory((prev) => {
+            const newHistory = [...prev];
+            newHistory.pop();
+            return newHistory;
+          });
+        }
+      : undefined;
 
   return (
-    <Tabs variant="unstyled">
-      <Box
-        bg={`bgLayer.${colorMode}`}
-        borderBottom="1px solid"
-        borderColor={`border.${colorMode}`}
-      >
-        <Container maxW="5xl" pt={10}>
-          <Flex w="100%" justifyContent="space-between" alignItems="flex-end">
-            <Flex flexDir="column" gap={2} w="100%">
+    <>
+      <div className="bg-white">
+        <div className="pt-10 cli-container">
+          <div className="flex w-full justify-between items-end">
+            <div className="flex flex-col w-full">
               <BreadcrumbLink href={`/`}>Applications</BreadcrumbLink>
               {loading ? (
                 <Skeleton h="36px" w="100%" maxW="250px" rounded="lg" />
               ) : (
-                <Heading>
-                  {option.isSome(application)
-                    ? application.value.name
-                    : "Application"}
-                </Heading>
+                <h1 className="font-bold text-[36px]">
+                  {application?.name ?? "Application"}
+                </h1>
               )}
-            </Flex>
-
-            {loading ? (
-              <Skeleton h="36px" w="100%" maxW="90px" rounded="lg" />
-            ) : (
-              <Button size="sm" onClick={onSync} isDisabled={loading}>
-                {loading ? <Spinner size="sm" /> : "Sync"}
-              </Button>
-            )}
-          </Flex>
-
-          <TabList mt={5} gap={5}>
-            <Tab px={0}>Services</Tab>
-            <Tab px={0}>Logs</Tab>
-          </TabList>
-          <TabIndicator mt="-2px" height="2px" bg={`text.${colorMode}`} />
-        </Container>
-      </Box>
-      <Container maxW="5xl" py="10">
-        <TabPanels>
-          <TabPanel p={0}>
-            <Grid
-              templateColumns={
-                !loading && option.isNone(application)
-                  ? "1fr"
-                  : "repeat(3, 1fr)"
-              }
-              gap={6}
-              w="100%"
+            </div>
+          </div>
+        </div>
+      </div>
+      <Tabs defaultValue="services">
+        <div className="bg-white border-bottom border-neutral-100">
+          <div className="pt-10 cli-container">
+            <TabList>
+              <Tab value="services">Services</Tab>
+              <Tab value="logs">Logs</Tab>
+            </TabList>
+          </div>
+        </div>
+        <div className="py-10 cli-container">
+          <TabContent value="services">
+            <div
+              className={clsx(
+                "grid gap-6 w-full",
+                !loading && !application ? "" : "grid-cols-3"
+              )}
             >
-              {loading
-                ? Array.from(Array(9).keys()).map((idx) => (
-                    <GridItem key={idx}>
-                      <ServiceCard loading />
-                    </GridItem>
-                  ))
-                : pipe(
-                    application,
-                    option.match(
-                      () => <ErrorCard message="Unable to load application" />,
-                      (a) =>
-                        a.services.length > 0 ? (
-                          <>
-                            <ServiceModal
-                              service={activeService}
-                              open={!!activeService}
-                              onClose={() => setActiveService(null)}
-                              projectId={projectId}
-                              applicationId={a.unique}
-                            />
-                            {a.services.map((service, idx) => (
-                              <GridItem
-                                key={idx}
-                                cursor="pointer"
-                                onClick={() => setActiveService(service)}
-                              >
-                                <ServiceCard service={service} />
-                              </GridItem>
-                            ))}
-                          </>
-                        ) : (
-                          <Text>No services found</Text>
-                        )
-                    )
-                  )}
-            </Grid>
-          </TabPanel>
-        </TabPanels>
-      </Container>
-    </Tabs>
+              {loading ? (
+                Array.from(Array(9).keys()).map((idx) => (
+                  <div key={idx}>
+                    <ServiceCard loading />
+                  </div>
+                ))
+              ) : !application ? (
+                <ErrorCard message="Unable to load application" />
+              ) : application.services.length > 0 ? (
+                <>
+                  <ServiceModal
+                    serviceId={preview?.id.split("/")[1]}
+                    applicationId={preview?.id.split("/")[0]}
+                    previewService={(id) =>
+                      setPreviewHistory((prev) => [
+                        ...prev,
+                        { type: "service", id },
+                      ])
+                    }
+                    previewAgent={(id) =>
+                      setPreviewHistory((prev) => [
+                        ...prev,
+                        { type: "agent", id },
+                      ])
+                    }
+                    undoPreviewHistory={undoPreviewHistory}
+                    open={!!preview && preview.type === "service"}
+                    onClose={() => setPreviewHistory([])}
+                  />
+
+                  <AgentModal
+                    name={preview?.id.split("/")[0]}
+                    version={preview?.id.split("/")[1]}
+                    open={!!preview && preview.type === "agent"}
+                    onClose={() => setPreviewHistory([])}
+                    undoPreviewHistory={undoPreviewHistory}
+                  />
+
+                  {application.services.map((service, idx) => (
+                    <div
+                      key={idx}
+                      className="cursor-pointer"
+                      onClick={() =>
+                        setPreviewHistory([
+                          {
+                            id: `${application.name}/${service.name}`,
+                            type: "service",
+                          },
+                        ])
+                      }
+                    >
+                      <ServiceCard
+                        service={service}
+                        previewAgent={(id) =>
+                          setPreviewHistory([{ id, type: "agent" }])
+                        }
+                        previewService={(id) =>
+                          setPreviewHistory([{ id, type: "service" }])
+                        }
+                        dependsOn={serviceDependencies?.edges
+                          .filter(
+                            (edge) =>
+                              edge.to === `${application.name}/${service.name}`
+                          )
+                          .map((edge) => edge.from)}
+                        requiredBy={serviceDependencies?.edges
+                          .filter(
+                            (edge) =>
+                              edge.from ===
+                              `${application.name}/${service.name}`
+                          )
+                          .map((edge) => edge.to)}
+                      />
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <span>No services found</span>
+              )}
+            </div>
+          </TabContent>
+          <TabContent value="logs">
+            <ProjectLogs filter={{ application: application?.name }} />
+          </TabContent>
+        </div>
+      </Tabs>
+    </>
   );
 };

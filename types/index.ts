@@ -1,49 +1,62 @@
-export type Plugin = {
-  usage: {
-    base: string;
-    uses: {
-      project: string;
+export type ServiceDependencies = {
+  nodes: { id: string; value: boolean }[];
+  edges: { from: `${string}/${string}`; to: `${string}/${string}` }[];
+};
+
+export type Endpoint =
+  | {
+      name: "rest";
+      description: string;
+      visibility: string;
       application: string;
-      unique: string;
-      version: string;
-    }[];
-  };
-};
+      service: string;
+      namespace: string;
+      api: {
+        rest: {
+          openapi: string;
+          routes: { methods: string[]; path: `/${string}` }[];
+        };
+      };
+    }
+  | {
+      name: "grpc";
+      description: string;
+      visibility: string;
+      application: string;
+      service: string;
+      namespace: string;
+      api: { grpc: { proto: string; rpc: { name: string }[] } };
+    };
 
-export type Endpoint = {
+export type Agent = {
+  kind: "SERVICE";
   name: string;
-  apis: { name: string };
-};
-
-export type Deployment = {
-  deployment: { name: string };
-  information: { version: string };
+  publisher: string;
+  version: string;
 };
 
 export type Service = {
   name: string;
-  unique: string;
-  base: string;
-  version: string;
+  description: string;
+  application: string;
+  agent: Agent;
   endpoints: Endpoint[];
-};
-
-export type ServiceInformation = {
-  source: {
-    information: { version: string };
-  };
-  deployments: Deployment[];
 };
 
 export type Application = {
   name: string;
-  unique: string;
+  description: string;
+  project: string;
   services: Service[];
 };
 
 export type Project = {
+  organization: {
+    name: string;
+    domain: string;
+  };
   name: string;
-  unique: string;
+  description: string;
   applications: Application[];
 };
 

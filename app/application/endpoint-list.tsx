@@ -73,7 +73,7 @@ const Endpoint = ({
   service: Service;
   endpoint: Service["endpoints"][number];
 }) => {
-  const toCopy = `codefly.Endpoint("${service.unique}.default${
+  const toCopy = `codefly.Endpoint("${service.service}.default${
     endpoint.name === "default" ? "" : `:${endpoint.name}`
   }")`;
   const { hasCopied, onCopy } = useClipboard(toCopy);

@@ -1,2 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+body {
+  @apply text-black;
+}
 
+.cli-container {
+  @apply mx-auto max-w-5xl px-4 w-full;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  @apply font-semibold;
+}
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown p {
+  @apply p-0 mb-5;
+}
+.markdown h1 {
+  @apply text-[48px];
+}
+.markdown h2 {
+  @apply text-[34px] mt-[20px] mb-[6px];
+}
+.markdown h3 {
+  @apply text-[20px];
+}
+.markdown h4 {
+  @apply text-[18px];
+}
+.markdown h5 {
+  @apply text-[16px];
+}
+.markdown a {
+  @apply text-[#0099ff] underline;
+}
+.markdown ul,
+.markdown ol {
+  @apply p-0 m-0;
+}
+.markdown li {
+  @apply leading-6;
+}
+.markdown li ul,
+.markdown li ul {
+  @apply ml-6;
+}
+.markdown pre {
+  @apply px-6 whitespace-pre-wrap;
+}
+.markdown code {
+  @apply font-mono leading-[1.5] text-[13px];
+}
+.markdown aside {
+  @apply block float-right w-[390px];
+}
+.markdown blockquote {
+  @apply my-4 mx-8 max-w-[476px];
+}
+.markdown blockquote p {
+  @apply text-[#666] max-w-[460px];
+}
+.markdown hr {
+  @apply border-gray-100;
+}
+.markdown table {
+  @apply border-collapse m-4 border border-[#ccc];
+}
+.markdown table thead {
+  @apply bg-[#eee];
+}
+.markdown table td {
+  @apply py-2 px-4 border border-[#ccc];
+}

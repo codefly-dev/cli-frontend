@@ -48,7 +48,7 @@ export function PageTopBar() {
 
         <List display="flex" flexDir="row" gap={4}>
           <ListItem>
-            <Link href="/">Workspace</Link>
+            <Link href="/">Project</Link>
           </ListItem>
           <ListItem display="flex" alignItems="center" gap={2}>
             <a href="#">Marketplace</a> <Icon as={ExternalLinkIcon} />
@@ -56,14 +56,14 @@ export function PageTopBar() {
         </List>
       </Flex>
 
-      <IconButton
+      {/* <IconButton
         aria-label="Toggle theme"
         variant="ghost"
         title="Toggle theme"
         onClick={toggleColorMode}
       >
         <Icon as={colorMode === "light" ? SunIcon : MoonIcon} boxSize={18} />
-      </IconButton>
+      </IconButton> */}
     </Flex>
   );
 }

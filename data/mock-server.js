@@ -1,8 +1,27 @@
-const cors = require("@fastify/cors");
-const Fastify = require("fastify");
+"use strict";
 
-const server = Fastify();
-server.register(cors, {});
+const fastify = require("fastify")();
+fastify.register(require("@fastify/cors"), {});
+fastify.register(require("@fastify/websocket"));
+
+fastify.register(async function (fastify) {
+  fastify.get("/api/project/logs", { websocket: true }, (connection, req) => {
+    connection.socket.on("message", (message) => {
+      // connection.socket.send({
+      //   logs: Array(50).fill({
+      //     at: "09:35:10.031",
+      //     application: "some-app",
+      //     service: "some-service",
+      //     kind: ["UNKNOWN", "PLUGIN", "SERVICE"][
+      //       Math.floor(Math.random() * (2 - 0 + 1) + 0)
+      //     ],
+      //     message: "Previous build caches not available",
+      //   }),
+      // });
+      connection.socket.send("Welcome to Ugee WS");
+    });
+  });
+});
 
 const routes = {
   "/api/project/information": require("./api/project.view.json"),
@@ -12,15 +31,15 @@ const routes = {
 };
 
 for (const route in routes) {
-  server.get(route, async (_, reply) => {
+  fastify.get(route, async (_, reply) => {
     reply.code(200).send(routes[route]);
   });
 }
 
-server.listen({ port: 3001 }, (err, address) => {
+fastify.listen({ port: 3001 }, (err, address) => {
   if (err) {
     console.error(err);
     process.exit(1);
   }
-  console.log(`Server listening at ${address}`);
+  console.log(`fastify listening at ${address}`);
 });
