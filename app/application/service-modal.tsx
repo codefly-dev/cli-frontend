@@ -138,7 +138,7 @@ export function ServiceModal({
                     <TabContent key={idx} value={endpoint.name}>
                       {endpoint.name === "rest" ? (
                         <RestEndpointPreview endpoint={endpoint} />
-                      ) : (
+                      ) : endpoint.name === "grpc" ? (
                         <div className="p-4 mt-3 rounded-xl bg-gray-50 border border-gray-200">
                           {endpoint.api.grpc.proto ? (
                             <SyntaxHighlighter
@@ -151,7 +151,7 @@ export function ServiceModal({
                             "Unable to load endpoint"
                           )}
                         </div>
-                      )}
+                      ) : null}
                     </TabContent>
                   ))}
                 </Tabs>

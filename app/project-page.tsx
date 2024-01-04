@@ -10,11 +10,7 @@ import clsx from "clsx";
 import Link from "next/link";
 import pluralize from "pluralize";
 import useSWR from "swr";
-import {
-  DependencyTree,
-  Tree,
-  type ApplicationDependencyGraph,
-} from "./dependency-graph";
+import { DependencyTree, Tree, type DependencyMap } from "./dependency-graph";
 import { ProjectLogs } from "./project-logs";
 import { useActiveProject } from "./use-active-project";
 
@@ -22,7 +18,7 @@ export function ProjectPage() {
   const { project, error, isLoading } = useActiveProject();
 
   const { data: dependendyGraphs } = useSWR<{
-    graphs: ApplicationDependencyGraph[];
+    graphs: DependencyMap[];
   }>(`/overall/project/${project?.name}/public-applications-graph`, (route) =>
     fetch(API_URL + route).then((res) => res.json())
   );
@@ -96,9 +92,13 @@ export function ProjectPage() {
             <ProjectLogs />
           </TabContent>
           <TabContent value="graph">
-            <DependencyTree
-              trees={transformDependencyGraphs(dependendyGraphs?.graphs)}
-            />
+            {dependendyGraphs?.graphs && dependendyGraphs.graphs.length > 0 ? (
+              <DependencyTree
+                trees={transformDependencyGraphs(dependendyGraphs?.graphs)}
+              />
+            ) : (
+              <span>No graphs found</span>
+            )}
           </TabContent>
         </div>
       </Tabs>
@@ -145,15 +145,16 @@ const ApplicationCard = ({
   );
 };
 
-function transformDependencyGraphs(
-  graphs?: ApplicationDependencyGraph[]
-): Tree[] {
+function transformDependencyGraphs(graphs?: DependencyMap[]): Tree[] {
   if (!graphs) {
     return [];
   }
 
   return graphs.map((graph) => {
     const root = graph.nodes.find((node) => node.type === "APPLICATION");
+    if (!root) {
+      throw new Error("No root found in dependency graph");
+    }
     const services = graph.nodes.filter((node) => node.type === "SERVICE");
     const servicesWithChildren = services.map((service) => {
       return {
@@ -161,9 +162,16 @@ function transformDependencyGraphs(
         id: service.id.replace(`${root!.id}/`, ""),
         children: graph.nodes
           .filter((e) => e.type === "ENDPOINT" && e.id.startsWith(service.id))
-          .map((e) => ({ ...e, id: e.id.replace(`${service.id}/`, "") })),
+          .map(
+            (e) =>
+              ({
+                ...e,
+                id: e.id.replace(`${service.id}/`, ""),
+                children: [],
+              } satisfies Tree)
+          ),
       };
     });
-    return { ...root!, children: servicesWithChildren };
+    return { ...root, children: servicesWithChildren } satisfies Tree;
   });
 }

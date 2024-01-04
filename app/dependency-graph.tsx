@@ -6,17 +6,7 @@ export type Tree = {
   id: string;
   value: boolean;
   type: "ENDPOINT" | "APPLICATION" | "SERVICE";
-  children?: Tree[];
-  // Only available in tree map made by createTreeMap
-  parent?: string;
-};
-
-type TreeDict = {
-  id: Tree["id"];
-  value: Tree["value"];
-  type: Tree["type"];
-  children?: string[];
-  parent?: string;
+  children: Tree[];
 };
 
 const MARGIN = { top: 60, right: 100, bottom: 60, left: 100 };
@@ -42,7 +32,7 @@ const NODE_WIDTH = 150;
 //   ],
 // };
 
-export type ApplicationDependencyGraph = {
+export type DependencyMap = {
   nodes: {
     id: string;
     value: boolean;
