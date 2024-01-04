@@ -1,8 +1,8 @@
 import { LayoutWrapper } from "@/components/layout-wrapper";
+import { PageTopBar } from "@/components/page-top-bar";
 import { Providers } from "@/components/providers";
 import { inter } from "./fonts";
 import "./globals.css";
-import { PageTopBar } from "@/components/page-top-bar";
 
 export const metadata = {
   title: "Codefly Tower",

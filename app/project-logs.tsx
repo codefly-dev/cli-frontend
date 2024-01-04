@@ -1,20 +1,10 @@
 import { Card } from "@/components/card";
 import { Log } from "@/types";
 import { API_URL } from "@/utils/constants";
-import {
-  Badge,
-  Flex,
-  Icon,
-  Input,
-  Table,
-  Tbody,
-  Td,
-  Tr,
-} from "@chakra-ui/react";
+import { Badge, Flex, Icon, Table, Tbody, Td, Tr } from "@chakra-ui/react";
 import { ActivityLogIcon } from "@radix-ui/react-icons";
 import { useEffect, useMemo, useState } from "react";
 import DatePicker from "react-datepicker";
-
 import "react-datepicker/dist/react-datepicker.css";
 
 export function ProjectLogs({

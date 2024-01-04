@@ -2,7 +2,6 @@ import { Dialog, DialogTitle } from "@/components/dialog";
 import { API_URL } from "@/utils/constants";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import Markdown from "react-markdown";
-import "swagger-ui-react/swagger-ui.css";
 import useSWR from "swr";
 
 export function AgentModal({
@@ -27,7 +26,7 @@ export function AgentModal({
     capabilities: { type: string }[];
     languages: { type: string }[];
     readMe: string;
-  }>(`/overall/agent/${name}:${version}/information`, (route) =>
+  }>(open ? `/overall/agent/${name}:${version}/information` : null, (route) =>
     fetch(API_URL + route).then((res) => res.json())
   );
 

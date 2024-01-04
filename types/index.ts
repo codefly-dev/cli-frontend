@@ -3,30 +3,32 @@ export type ServiceDependencies = {
   edges: { from: `${string}/${string}`; to: `${string}/${string}` }[];
 };
 
-export type Endpoint =
-  | {
-      name: "rest";
-      description: string;
-      visibility: string;
-      application: string;
-      service: string;
-      namespace: string;
-      api: {
-        rest: {
-          openapi: string;
-          routes: { methods: string[]; path: `/${string}` }[];
-        };
-      };
-    }
-  | {
-      name: "grpc";
-      description: string;
-      visibility: string;
-      application: string;
-      service: string;
-      namespace: string;
-      api: { grpc: { proto: string; rpc: { name: string }[] } };
+export type RESTEndpoint = {
+  name: "rest";
+  description: string;
+  visibility: string;
+  application: string;
+  service: string;
+  namespace: string;
+  api: {
+    rest: {
+      openapi: string;
+      routes: { methods: string[]; path: `/${string}` }[];
     };
+  };
+};
+
+export type GRPCEndpoint = {
+  name: "grpc";
+  description: string;
+  visibility: string;
+  application: string;
+  service: string;
+  namespace: string;
+  api: { grpc: { proto: string; rpc: { name: string }[] } };
+};
+
+export type Endpoint = RESTEndpoint | GRPCEndpoint;
 
 export type Agent = {
   kind: "SERVICE";

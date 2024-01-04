@@ -1,19 +1,31 @@
-import { Box, Container, GridItem, Icon, Stack } from "@chakra-ui/react";
-import { CodeIcon } from "@radix-ui/react-icons";
-import Link from "next/link";
-import pluralize from "pluralize";
-
 import { Card } from "@/components/card";
 import { ErrorCard } from "@/components/error-card";
 import { Skeleton } from "@/components/skeleton";
 import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
 import type { Application } from "@/types";
+import { API_URL } from "@/utils/constants";
+import { Box, Container, GridItem, Icon, Stack } from "@chakra-ui/react";
+import { CodeIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
+import Link from "next/link";
+import pluralize from "pluralize";
+import useSWR from "swr";
+import {
+  DependencyTree,
+  Tree,
+  type ApplicationDependencyGraph,
+} from "./dependency-graph";
 import { ProjectLogs } from "./project-logs";
 import { useActiveProject } from "./use-active-project";
 
 export function ProjectPage() {
   const { project, error, isLoading } = useActiveProject();
+
+  const { data: dependendyGraphs } = useSWR<{
+    graphs: ApplicationDependencyGraph[];
+  }>(`/overall/project/${project?.name}/public-applications-graph`, (route) =>
+    fetch(API_URL + route).then((res) => res.json())
+  );
 
   if (error) {
     return (
@@ -46,6 +58,7 @@ export function ProjectPage() {
             <TabList>
               <Tab value="services">Applications</Tab>
               <Tab value="logs">Logs</Tab>
+              <Tab value="graph">Dependency Graph</Tab>
             </TabList>
           </div>
         </div>
@@ -81,6 +94,11 @@ export function ProjectPage() {
           </TabContent>
           <TabContent value="logs">
             <ProjectLogs />
+          </TabContent>
+          <TabContent value="graph">
+            <DependencyTree
+              trees={transformDependencyGraphs(dependendyGraphs?.graphs)}
+            />
           </TabContent>
         </div>
       </Tabs>
@@ -126,3 +144,26 @@ const ApplicationCard = ({
     </Card>
   );
 };
+
+function transformDependencyGraphs(
+  graphs?: ApplicationDependencyGraph[]
+): Tree[] {
+  if (!graphs) {
+    return [];
+  }
+
+  return graphs.map((graph) => {
+    const root = graph.nodes.find((node) => node.type === "APPLICATION");
+    const services = graph.nodes.filter((node) => node.type === "SERVICE");
+    const servicesWithChildren = services.map((service) => {
+      return {
+        ...service,
+        id: service.id.replace(`${root!.id}/`, ""),
+        children: graph.nodes
+          .filter((e) => e.type === "ENDPOINT" && e.id.startsWith(service.id))
+          .map((e) => ({ ...e, id: e.id.replace(`${service.id}/`, "") })),
+      };
+    });
+    return { ...root!, children: servicesWithChildren };
+  });
+}

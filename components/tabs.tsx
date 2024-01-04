@@ -20,7 +20,7 @@ export function TabList({
 }: RadixTabs.TabsListProps) {
   return (
     <RadixTabs.List
-      className={clsx("flex border-b border-neutral-100", className)}
+      className={clsx("flex gap-4 border-b border-neutral-100", className)}
       aria-label="Manage your account"
       {...props}
     >
@@ -37,7 +37,7 @@ export function Tab({
   return (
     <RadixTabs.Trigger
       className={clsx(
-        "text-black px-5 h-[45px] w-auto flex items-center justify-center text-[15px] leading-none select-none data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current outline-none cursor-default",
+        "text-black h-[45px] w-auto flex items-center justify-center text-[15px] leading-none select-none data-[state=active]:shadow-[inset_0_-1px_0_0,0_1px_0_0] data-[state=active]:shadow-current outline-none cursor-default",
         className
       )}
       {...props}

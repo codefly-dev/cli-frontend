@@ -16,7 +16,9 @@ import { ServiceModal } from "./service-modal";
 export function ApplicationPage({ applicationId }: { applicationId: string }) {
   const { project, error, isLoading: loading } = useActiveProject();
   const { data: serviceDependencies } = useSWR<ServiceDependencies>(
-    `/overall/project/${project?.name}/service-dependency-graph`,
+    project
+      ? `/overall/project/${project?.name}/service-dependency-graph`
+      : null,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
@@ -41,7 +43,7 @@ export function ApplicationPage({ applicationId }: { applicationId: string }) {
   );
 }
 
-const AppServices = ({
+export function AppServices({
   application,
   serviceDependencies,
   loading,
@@ -49,7 +51,7 @@ const AppServices = ({
   application?: Application;
   serviceDependencies?: ServiceDependencies;
   loading: boolean;
-}) => {
+}) {
   const [previewHistory, setPreviewHistory] = useState<
     { type: "agent" | "service"; id: `${string}/${string}` }[]
   >([]);
@@ -192,4 +194,4 @@ const AppServices = ({
       </Tabs>
     </>
   );
-};
+}

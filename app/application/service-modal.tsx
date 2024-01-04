@@ -1,18 +1,15 @@
 import { Dialog, DialogTitle } from "@/components/dialog";
 import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
-import type { Service, ServiceDependencies } from "@/types";
-import { useColorMode } from "@chakra-ui/react";
-import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
-import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import protobuf from "react-syntax-highlighter/dist/esm/languages/hljs/protobuf";
-import SwaggerUI from "swagger-ui-react";
-import "swagger-ui-react/swagger-ui.css";
-import { useActiveProject } from "../use-active-project";
+import type { ServiceDependencies } from "@/types";
 import { API_URL } from "@/utils/constants";
-import useSWR from "swr";
-import { ArrowBackIcon } from "@chakra-ui/icons";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Fragment } from "react";
+import { Light as SyntaxHighlighter } from "react-syntax-highlighter";
+import protobuf from "react-syntax-highlighter/dist/esm/languages/hljs/protobuf";
+import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import useSWR from "swr";
+import { useActiveProject } from "../use-active-project";
+import { RestEndpointPreview } from "./rest-endpoint-preview";
 
 SyntaxHighlighter.registerLanguage("protobuf", protobuf);
 
@@ -40,7 +37,7 @@ export function ServiceModal({
     ?.services?.find((s) => s.name === serviceId);
 
   const { data: serviceDependencies } = useSWR<ServiceDependencies>(
-    `/overall/project/${project?.name}/service-dependency-graph`,
+    open ? `/overall/project/${project?.name}/service-dependency-graph` : null,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
@@ -130,7 +127,6 @@ export function ServiceModal({
                   {service.endpoints.length})
                 </h4>
                 <Tabs defaultValue={service.endpoints[0].name}>
-                  {/* <SwaggerUI /> */}
                   <TabList>
                     {service.endpoints.map((endpoint, idx) => (
                       <Tab key={idx} value={endpoint.name}>
@@ -141,20 +137,19 @@ export function ServiceModal({
                   {service.endpoints.map((endpoint, idx) => (
                     <TabContent key={idx} value={endpoint.name}>
                       {endpoint.name === "rest" ? (
-                        <SwaggerUI
-                          spec={atob(endpoint.api.rest.openapi)}
-                          requestInterceptor={(req) => {
-                            const url = new URL(req.url);
-                            req.url = "http://localhost:11331" + url.pathname;
-
-                            return req;
-                          }}
-                        />
+                        <RestEndpointPreview endpoint={endpoint} />
                       ) : (
                         <div className="p-4 mt-3 rounded-xl bg-gray-50 border border-gray-200">
-                          <SyntaxHighlighter language="protobuf" style={docco}>
-                            {atob(endpoint.api.grpc.proto)}
-                          </SyntaxHighlighter>
+                          {endpoint.api.grpc.proto ? (
+                            <SyntaxHighlighter
+                              language="protobuf"
+                              style={docco}
+                            >
+                              {atob(endpoint.api.grpc.proto)}
+                            </SyntaxHighlighter>
+                          ) : (
+                            "Unable to load endpoint"
+                          )}
                         </div>
                       )}
                     </TabContent>

@@ -1,3 +1,5 @@
+// NOTE: This mock server is out of date and should be updated to match the current API.
+
 "use strict";
 
 const fastify = require("fastify")();
@@ -18,7 +20,7 @@ fastify.register(async function (fastify) {
       //     message: "Previous build caches not available",
       //   }),
       // });
-      connection.socket.send("Welcome to Ugee WS");
+      connection.socket.send("Welcome to WS");
     });
   });
 });
@@ -36,7 +38,7 @@ for (const route in routes) {
   });
 }
 
-fastify.listen({ port: 3001 }, (err, address) => {
+fastify.listen({ port: 3003 }, (err, address) => {
   if (err) {
     console.error(err);
     process.exit(1);
