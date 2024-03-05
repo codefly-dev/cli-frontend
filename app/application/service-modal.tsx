@@ -39,7 +39,7 @@ export function ServiceModal({
     ?.services?.find((s) => s.name === serviceId);
 
   const { data: serviceDependencies } = useSWR<ServiceDependencies>(
-    open ? `/overall/project/${project?.name}/service-dependency-graph` : null,
+    open && project ? `/overall/project/${project?.name}/service-dependency-graph` : null,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
 

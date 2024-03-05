@@ -19,8 +19,8 @@ export function ProjectPage() {
 
   const { data: dependendyGraphs } = useSWR<{
     graphs: DependencyMap[];
-  }>(`/overall/project/${project?.name}/public-applications-graph`, (route) =>
-    fetch(API_URL + route).then((res) => res.json())
+  }>(project?.name ? `/overall/project/${project?.name}/public-applications-graph` : null,
+    (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
   if (error) {
@@ -164,11 +164,11 @@ function transformDependencyGraphs(graphs?: DependencyMap[]): Tree[] {
           .filter((e) => e.type === "ENDPOINT" && e.id.startsWith(service.id))
           .map(
             (e) =>
-              ({
-                ...e,
-                id: e.id.replace(`${service.id}/`, ""),
-                children: [],
-              } satisfies Tree)
+            ({
+              ...e,
+              id: e.id.replace(`${service.id}/`, ""),
+              children: [],
+            } satisfies Tree)
           ),
       };
     });
