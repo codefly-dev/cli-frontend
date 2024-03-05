@@ -21,9 +21,9 @@ export function ProjectLogs({
   const [search, setSearch] = useState("");
 
   const [startDate, setStartDate] = useState<Date | null>(
-    new Date("2014/02/08")
+    new Date("2024/01/01")
   );
-  const [endDate, setEndDate] = useState<Date | null>(new Date("2014/02/10"));
+  const [endDate, setEndDate] = useState<Date | null>(new Date("2024/03/10"));
 
   useEffect(() => {
     if (!ws) {
@@ -44,6 +44,8 @@ export function ProjectLogs({
     ws.onclose = () => {
       setWs(null);
     };
+
+    return setWs(null)
   }, [ws]);
 
   const filteredLogs = useMemo(() => {
