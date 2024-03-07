@@ -30,7 +30,7 @@ export function RestEndpointPreview({ endpoint }: { endpoint: RESTEndpoint }) {
       spec={atob(endpoint.api.rest.openapi)}
       requestInterceptor={(req) => {
         const url = new URL(req.url);
-        req.url = "http://" + data.addresses[0] + url.pathname;
+        req.url = data.addresses[0] + url.pathname;
         return req;
       }}
     />
