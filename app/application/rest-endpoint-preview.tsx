@@ -18,7 +18,7 @@ const SwaggerUI = dynamic(() => import("swagger-ui-react"), {
 });
 
 export function RestEndpointPreview({ endpoint }: { endpoint: RESTEndpoint }) {
-  const { data, error, isLoading } = useSWR<{ addresses: string[] }>(
+  const { data, error, isLoading } = useSWR<{ address: string }>(
     `/active/project/network-mapping/${endpoint.application}/${endpoint.service}/${endpoint.name}`,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
@@ -30,11 +30,13 @@ export function RestEndpointPreview({ endpoint }: { endpoint: RESTEndpoint }) {
       spec={atob(endpoint.api.rest.openapi)}
       requestInterceptor={(req) => {
         const url = new URL(req.url);
-        // req.url = data.addresses[0] + url.pathname;
+        if(data?.address) {
+            req.url = data.address + url.pathname;
+        }
+        
         return req;
       }}
-      // TODO: remove this when the endpoint is fixed.
-      tryItOutEnabled={false}
+      tryItOutEnabled={!data?.address}
     />
   );
 }
