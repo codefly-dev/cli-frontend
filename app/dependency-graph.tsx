@@ -69,7 +69,7 @@ export function DependencyTree({
 
   const allNodes = cluster.descendants().map((node) => {
     return (
-      <TreeNode key={node.id} node={node} active={false} onClick={() => ({})} />
+      <TreeNode key={node.data.id} node={node} active={false} onClick={() => ({})} />
     );
   });
 
