@@ -25,18 +25,16 @@ export function RestEndpointPreview({ endpoint }: { endpoint: RESTEndpoint }) {
 
   return isLoading ? (
     <Loader />
-  ) : data?.addresses?.length ? (
+  ) :  (
     <SwaggerUI
       spec={atob(endpoint.api.rest.openapi)}
       requestInterceptor={(req) => {
         const url = new URL(req.url);
-        req.url = data.addresses[0] + url.pathname;
+        // req.url = data.addresses[0] + url.pathname;
         return req;
       }}
+      // TODO: remove this when the endpoint is fixed.
+      tryItOutEnabled={false}
     />
-  ) : (
-    <div className="py-4">
-      <p>Unable to REST endpoint</p>
-    </div>
   );
 }
