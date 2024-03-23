@@ -16,9 +16,34 @@ export function useActiveProject() {
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
+  const services = {};
+  const nodes: { id: string; value: boolean }[] = [];
+  const edgesSet = {};
+  const edges: { from: `${string}/${string}`; to: `${string}/${string}` }[] = [];
+
+  data?.applications.forEach(application => {
+    application.services.forEach(service => {
+      services[service.name] = service;
+
+      service?.serviceDependencies?.forEach(dependency => {
+        edgesSet[`${service.application}/${dependency.name}-${dependency.application}/${dependency.name}`] = {
+          to: `${service.application}/${service.name}`,
+          from: `${dependency.application}/${dependency.name}`,
+        }
+      })
+    })
+  })
+
+  Object.keys(edgesSet).forEach(edge => {
+    edges.push(edgesSet[edge])
+  })
+
+
   return {
     ...project,
     project: data,
     isLoading: isLoadingActive || project.isLoading,
+    edges,
+    nodes,
   };
 }

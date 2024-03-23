@@ -20,6 +20,7 @@ export const ServiceCard = ({
   dependsOn?: `${string}/${string}`[];
   requiredBy?: `${string}/${string}`[];
 }) => {
+
   return (
     <Card>
       {loading ? (
