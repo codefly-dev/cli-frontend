@@ -1,6 +1,5 @@
 import { Dialog, DialogTitle } from "@/components/dialog";
 import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
-import type { ServiceDependencies } from "@/types";
 import { API_URL } from "@/utils/constants";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Fragment } from "react";
@@ -32,22 +31,22 @@ export function ServiceModal({
   previewAgent?(agent: `${string}/${string}`): void;
   undoPreviewHistory?(): void;
 }) {
-  const { project } = useActiveProject();
+  const { project, edges } = useActiveProject();
 
   const service = project?.applications
     ?.find((a) => a.name === applicationId)
     ?.services?.find((s) => s.name === serviceId);
 
-  const { data: serviceDependencies } = useSWR<ServiceDependencies>(
-    open && project ? `/overall/project/${project?.name}/service-dependency-graph` : null,
-    (route) => fetch(API_URL + route).then((res) => res.json())
-  );
+  // const { data: serviceDependencies } = useSWR<ServiceDependencies>(
+  //   open && project ? `/overall/project/${project?.name}/service-dependency-graph` : null,
+  //   (route) => fetch(API_URL + route).then((res) => res.json())
+  // );
 
-  const dependsOn = serviceDependencies?.edges
+  const dependsOn = edges
     .filter((edge) => edge.to === `${service?.application}/${service?.name}`)
     .map((edge) => edge.from);
 
-  const requiredBy = serviceDependencies?.edges
+  const requiredBy = edges
     .filter((edge) => edge.from === `${service?.application}/${service?.name}`)
     .map((edge) => edge.to);
 

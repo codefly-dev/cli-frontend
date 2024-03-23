@@ -43,6 +43,7 @@ export type Service = {
   application: string;
   agent: Agent;
   endpoints: Endpoint[];
+  serviceDependencies : any[]
 };
 
 export type Application = {

@@ -14,13 +14,13 @@ import { ServiceCard } from "./service-card";
 import { ServiceModal } from "./service-modal";
 
 export function ApplicationPage({ applicationId }: { applicationId: string }) {
-  const { project, error, isLoading: loading } = useActiveProject();
-  const { data: serviceDependencies } = useSWR<ServiceDependencies>(
-    project
-      ? `/overall/project/${project?.name}/service-dependency-graph`
-      : null,
-    (route) => fetch(API_URL + route).then((res) => res.json())
-  );
+  const { project, error, isLoading: loading, nodes, edges } = useActiveProject();
+  // const { data: serviceDependencies } = useSWR<ServiceDependencies>(
+  //   project
+  //     ? `/overall/project/${project?.name}/service-dependency-graph`
+  //     : null,
+  //   (route) => fetch(API_URL + route).then((res) => res.json())
+  // );
 
   if (error) {
     return (
@@ -37,7 +37,10 @@ export function ApplicationPage({ applicationId }: { applicationId: string }) {
   return (
     <AppServices
       application={application}
-      serviceDependencies={serviceDependencies}
+      serviceDependencies={{
+        nodes,
+        edges,
+      }}
       loading={loading}
     />
   );
