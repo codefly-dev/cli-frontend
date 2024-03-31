@@ -10,7 +10,7 @@ export type RESTEndpoint = {
   application: string;
   service: string;
   namespace: string;
-  api: {
+  apiDetails: {
     rest: {
       openapi: string;
       routes: { methods: string[]; path: `/${string}` }[];
