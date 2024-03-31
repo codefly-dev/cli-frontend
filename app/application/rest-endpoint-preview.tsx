@@ -27,7 +27,7 @@ export function RestEndpointPreview({ endpoint }: { endpoint: RESTEndpoint }) {
     <Loader />
   ) :  (
     <SwaggerUI
-      spec={atob(endpoint.api.rest.openapi)}
+      spec={atob(endpoint.apiDetails.rest.openapi)}
       requestInterceptor={(req) => {
         const url = new URL(req.url);
         if(data?.address) {
