@@ -38,12 +38,12 @@ export function useActiveProject() {
     edges.push(edgesSet[edge])
   })
 
-
   return {
     ...project,
     project: data,
     isLoading: isLoadingActive || project.isLoading,
     edges,
     nodes,
+    services,
   };
 }
