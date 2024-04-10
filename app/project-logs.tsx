@@ -6,6 +6,7 @@ import { ActivityLogIcon } from "@radix-ui/react-icons";
 import { useEffect, useMemo, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useActiveProject } from "./use-active-project";
 
 export function ProjectLogs({
   filter,
@@ -20,10 +21,13 @@ export function ProjectLogs({
   const [kind, setKind] = useState<Log["kind"] | null>(null);
   const [search, setSearch] = useState("");
 
+  const [service, setService] = useState<string | null>();
+
   const [startDate, setStartDate] = useState<Date | null>(
     new Date("2024/01/01")
   );
   const [endDate, setEndDate] = useState<Date | null>(new Date("2024/03/10"));
+  const { services } = useActiveProject();
 
   useEffect(() => {
     if (!ws) {
@@ -77,8 +81,14 @@ export function ProjectLogs({
       );
     }
 
+    if (service && kind === "SERVICE") {
+      _filteredLogs = _filteredLogs.filter((log) =>
+        log.service === service
+      );
+    }
+
     return _filteredLogs;
-  }, [logs, filter, kind, search]);
+  }, [logs, filter, kind, search, service]);
 
   const inputClassNames =
     "w-full h-[32px] border border-neutral-100 rounded-lg px-3 w-full lg:max-w-[250px]";
@@ -101,6 +111,27 @@ export function ProjectLogs({
             </Badge>
           ))}
         </div>
+
+        {
+          kind === "SERVICE" && (
+            <div
+              className="flex gap-[10px] overflow-x-auto border p-2 pl-4 rounded-lg">{
+                Object.keys(services).map((s, idx) => (
+                  <Badge
+                    key={`${s}-${idx}`}
+                    colorScheme={s === service ? "green" : "gray"}
+                    rounded="full"
+                    px="10px"
+                    py="2px"
+                    cursor="pointer"
+                    onClick={() => setService(s as any)}
+                  >
+                    {s ?? "ALL"}
+                  </Badge>
+                ))}
+            </div>
+          )
+        }
 
         <div className="flex flex-wrap gap-2">
           <input
