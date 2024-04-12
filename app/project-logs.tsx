@@ -86,7 +86,6 @@ export function ProjectLogs({
     return _filteredLogs;
   }, [logs, filter, kind, search, service]);
 
-  console.log('_filteredLogs', filteredLogs)
 
   const inputClassNames =
     "w-full h-[32px] border border-neutral-100 rounded-lg px-3 w-full lg:max-w-[250px]";
