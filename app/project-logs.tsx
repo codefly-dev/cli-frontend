@@ -11,7 +11,7 @@ import { useActiveProject } from "./use-active-project";
 export function ProjectLogs({
   filter,
 }: {
-  filter?: { application?: string; service?: string };
+  filter?: { application?: string };
 }) {
   const [ws, setWs] = useState<WebSocket | null>(
     new WebSocket(API_URL.replace("http://", "ws://") + "/active/project/logs")
@@ -65,12 +65,6 @@ export function ProjectLogs({
       );
     }
 
-    if (filter?.service) {
-      _filteredLogs = _filteredLogs.filter(
-        (log) => log.service === filter.service
-      );
-    }
-
     if (kind) {
       _filteredLogs = _filteredLogs.filter((log) => log.kind === kind);
     }
@@ -81,14 +75,18 @@ export function ProjectLogs({
       );
     }
 
-    if (service && kind === "SERVICE") {
+    if (service) {
+
       _filteredLogs = _filteredLogs.filter((log) =>
         log.service === service
       );
+
     }
 
     return _filteredLogs;
   }, [logs, filter, kind, search, service]);
+
+  console.log('_filteredLogs', filteredLogs)
 
   const inputClassNames =
     "w-full h-[32px] border border-neutral-100 rounded-lg px-3 w-full lg:max-w-[250px]";
@@ -97,41 +95,20 @@ export function ProjectLogs({
     <Card className="flex flex-col gap-[10px]">
       <div className="flex flex-col pb-[15px] border-b border-neutral-100 gap-3">
         <div className="flex gap-[10px] overflow-x-auto">
-          {[null, "UNKNOWN", "PLUGIN", "SERVICE"].map((k, idx) => (
+          {[null, ...Object.keys(services)].map((s, idx) => (
             <Badge
-              key={`${k}-${idx}`}
-              colorScheme={k === kind ? "green" : "gray"}
+              key={`${s}-${idx}`}
+              colorScheme={s === service ? "green" : "gray"}
               rounded="full"
               px="10px"
               py="2px"
               cursor="pointer"
-              onClick={() => setKind(k as any)}
+              onClick={() => setService(s as any)}
             >
-              {k ?? "ALL"}
+              {s ?? "ALL"}
             </Badge>
           ))}
         </div>
-
-        {
-          kind === "SERVICE" && (
-            <div
-              className="flex gap-[10px] overflow-x-auto border p-2 pl-4 rounded-lg">{
-                Object.keys(services).map((s, idx) => (
-                  <Badge
-                    key={`${s}-${idx}`}
-                    colorScheme={s === service ? "green" : "gray"}
-                    rounded="full"
-                    px="10px"
-                    py="2px"
-                    cursor="pointer"
-                    onClick={() => setService(s as any)}
-                  >
-                    {s ?? "ALL"}
-                  </Badge>
-                ))}
-            </div>
-          )
-        }
 
         <div className="flex flex-wrap gap-2">
           <input
