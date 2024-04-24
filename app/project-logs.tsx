@@ -170,7 +170,19 @@ export function ProjectLogs({
                       timeZone: "Europe/Paris",
                     })}
                   </Td>
+                  <Td>
+                    <Badge
+                      colorScheme="green"
+                      rounded="full"
+                      px="10px"
+                      py="2px"
+                      mr="5px"
+                    >
+                      {log.service}
+                    </Badge>
+                  </Td>
                   <Td w="100%" position="relative">
+
                     <span>{log.message}</span>
                     <Flex
                       className="meta"
