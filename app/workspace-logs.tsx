@@ -6,9 +6,9 @@ import { ActivityLogIcon } from "@radix-ui/react-icons";
 import { useEffect, useMemo, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useActiveProject } from "./use-active-project";
+import { useActiveWorkspace } from "./use-active-workspace";
 
-export function ProjectLogs({
+export function WorkspaceLogs({
   filter,
 }: {
   filter?: { application?: string };
@@ -27,7 +27,7 @@ export function ProjectLogs({
     new Date("2024/01/01")
   );
   const [endDate, setEndDate] = useState<Date | null>(new Date("2024/03/10"));
-  const { services } = useActiveProject();
+  const { services } = useActiveWorkspace();
 
   useEffect(() => {
     if (!ws) {

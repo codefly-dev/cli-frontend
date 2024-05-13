@@ -14,7 +14,7 @@ const NODE_HEIGHT = 50;
 const NODE_WIDTH = 150;
 //   id: "web",
 //   value: false,
-//   type: "application",
+//   type: "module",
 //   children: [
 //     {
 //       id: "web/gateway",

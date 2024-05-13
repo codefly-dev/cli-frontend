@@ -1,7 +1,7 @@
 "use client";
 
-import { ProjectPage } from "./project-page";
+import { WorkspacePage } from "./workspace-page";
 
 export default function Page() {
-  return <ProjectPage />;
+  return <WorkspacePage />;
 }

@@ -2,19 +2,19 @@ import { BreadcrumbLink } from "@/components/breadcrumb-link";
 import { ErrorCard } from "@/components/error-card";
 import { Skeleton } from "@/components/skeleton";
 import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
-import type { Application, ServiceDependencies } from "@/types";
+import type { Module, ServiceDependencies } from "@/types";
 import { API_URL } from "@/utils/constants";
 import clsx from "clsx";
 import { useState } from "react";
 import useSWR from "swr";
 import { AgentModal } from "../agent/agent-modal";
-import { ProjectLogs } from "../project-logs";
-import { useActiveProject } from "../use-active-project";
+import { WorkspaceLogs } from "../workspace-logs";
+import { useActiveWorkspace } from "../use-active-workspace";
 import { ServiceCard } from "./service-card";
 import { ServiceModal } from "./service-modal";
 
-export function ApplicationPage({ applicationId }: { applicationId: string }) {
-  const { project, error, isLoading: loading, nodes, edges } = useActiveProject();
+export function ModulePage({ moduleId }: { moduleId: string }) {
+  const { workspace, error, isLoading: loading, nodes, edges } = useActiveWorkspace();
   // const { data: serviceDependencies } = useSWR<ServiceDependencies>(
   //   project
   //     ? `/overall/project/${project?.name}/service-dependency-graph`
@@ -30,13 +30,13 @@ export function ApplicationPage({ applicationId }: { applicationId: string }) {
     );
   }
 
-  const application = project?.applications?.find(
-    (a) => a.name === applicationId
+  const mod = workspace?.modules?.find(
+    (a) => a.name === moduleId
   );
 
   return (
-    <AppServices
-      application={application}
+    <ModuleServices
+      module={mod}
       serviceDependencies={{
         nodes,
         edges,
@@ -46,12 +46,12 @@ export function ApplicationPage({ applicationId }: { applicationId: string }) {
   );
 }
 
-export function AppServices({
-  application,
+export function ModuleServices({
+  module,
   serviceDependencies,
   loading,
 }: {
-  application?: Application;
+  module?: Module;
   serviceDependencies?: ServiceDependencies;
   loading: boolean;
 }) {
@@ -85,7 +85,7 @@ export function AppServices({
                 <Skeleton h="36px" w="100%" maxW="250px" rounded="lg" />
               ) : (
                 <h1 className="font-bold text-[36px]">
-                  {application?.name ?? "Application"}
+                  {module?.name ?? "Application"}
                 </h1>
               )}
             </div>
@@ -106,7 +106,7 @@ export function AppServices({
             <div
               className={clsx(
                 "grid gap-6 w-full",
-                !loading && !application ? "" : "grid-cols-3"
+                !loading && !module ? "" : "grid-cols-3"
               )}
             >
               {loading ? (
@@ -115,9 +115,9 @@ export function AppServices({
                     <ServiceCard loading />
                   </div>
                 ))
-              ) : !application ? (
+              ) : !module ? (
                 <ErrorCard message="Unable to load application" />
-              ) : application.services.length > 0 ? (
+              ) : module.services.length > 0 ? (
                 <>
                   <ServiceModal
                     serviceId={preview?.id.split("/")[1]}
@@ -147,14 +147,14 @@ export function AppServices({
                     undoPreviewHistory={undoPreviewHistory}
                   />
 
-                  {application.services.map((service, idx) => (
+                  {module.services.map((service, idx) => (
                     <div
                       key={idx}
                       className="cursor-pointer"
                       onClick={() =>
                         setPreviewHistory([
                           {
-                            id: `${application.name}/${service.name}`,
+                            id: `${module.name}/${service.name}`,
                             type: "service",
                           },
                         ])
@@ -171,14 +171,14 @@ export function AppServices({
                         dependsOn={serviceDependencies?.edges
                           .filter(
                             (edge) =>
-                              edge.to === `${application.name}/${service.name}`
+                              edge.to === `${module.name}/${service.name}`
                           )
                           .map((edge) => edge.from)}
                         requiredBy={serviceDependencies?.edges
                           .filter(
                             (edge) =>
                               edge.from ===
-                              `${application.name}/${service.name}`
+                              `${module.name}/${service.name}`
                           )
                           .map((edge) => edge.to)}
                       />
@@ -191,7 +191,7 @@ export function AppServices({
             </div>
           </TabContent>
           <TabContent value="logs">
-            <ProjectLogs filter={{ application: application?.name }} />
+            <WorkspaceLogs filter={{ application: module?.name }} />
           </TabContent>
         </div>
       </Tabs>

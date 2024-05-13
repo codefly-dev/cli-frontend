@@ -3,7 +3,7 @@
 import { ErrorCard } from "@/components/error-card";
 import { Container } from "@chakra-ui/react";
 import { useSearchParams } from "next/navigation";
-import { ApplicationPage } from "./application-page";
+import { ModulePage } from "./module-page";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -18,5 +18,5 @@ export default function Page() {
     );
   }
 
-  return <ApplicationPage applicationId={applicationId} />;
+  return <ModulePage moduleId={applicationId} />;
 }

@@ -19,7 +19,7 @@ const SwaggerUI = dynamic(() => import("swagger-ui-react"), {
 
 export function RestEndpointPreview({ endpoint }: { endpoint: RESTEndpoint }) {
   const { data, error, isLoading } = useSWR<{ address: string }>(
-    `/active/project/network-mapping/${endpoint.application}/${endpoint.service}/${endpoint.name}`,
+    `/workspace/network-mapping/${endpoint.application}/${endpoint.service}/${endpoint.name}`,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
 

@@ -8,7 +8,7 @@ import protobuf from "react-syntax-highlighter/dist/esm/languages/hljs/protobuf"
 import markdown from "react-syntax-highlighter/dist/esm/languages/hljs/markdown";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import useSWR from "swr";
-import { useActiveProject } from "../use-active-project";
+import { useActiveWorkspace } from "../use-active-workspace";
 import { RestEndpointPreview } from "./rest-endpoint-preview";
 
 SyntaxHighlighter.registerLanguage("protobuf", protobuf);
@@ -31,9 +31,9 @@ export function ServiceModal({
   previewAgent?(agent: `${string}/${string}`): void;
   undoPreviewHistory?(): void;
 }) {
-  const { project, edges } = useActiveProject();
+  const { workspace, edges } = useActiveWorkspace();
 
-  const service = project?.applications
+  const service = workspace?.applications
     ?.find((a) => a.name === applicationId)
     ?.services?.find((s) => s.name === serviceId);
 

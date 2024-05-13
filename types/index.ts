@@ -7,7 +7,7 @@ export type RESTEndpoint = {
   name: "rest";
   description: string;
   visibility: string;
-  application: string;
+  module: string;
   service: string;
   namespace: string;
   apiDetails: {
@@ -22,7 +22,7 @@ export type GRPCEndpoint = {
   name: "grpc";
   description: string;
   visibility: string;
-  application: string;
+  module: string;
   service: string;
   namespace: string;
   api: { grpc: { proto: string; rpc: { name: string }[] } };
@@ -40,27 +40,22 @@ export type Agent = {
 export type Service = {
   name: string;
   description: string;
-  application: string;
+  module: string;
   agent: Agent;
   endpoints: Endpoint[];
   serviceDependencies : any[]
 };
 
-export type Application = {
+export type Module = {
   name: string;
   description: string;
-  project: string;
   services: Service[];
 };
 
-export type Project = {
-  organization: {
-    name: string;
-    domain: string;
-  };
+export type Workspace = {
   name: string;
   description: string;
-  applications: Application[];
+  modules: Module[];
 };
 
 export type Log = {

@@ -2,17 +2,17 @@ import { Project } from "@/types";
 import { API_URL } from "@/utils/constants";
 import useSWR from "swr";
 
-export function useActiveProject() {
+export function useActiveWorkspace() {
   const { data: active, isLoading: isLoadingActive } = useSWR<{
-    project: string;
-    application: string;
+    workspace: string;
+    module: string;
     service: string;
-  }>("/active/project/information", (route) =>
+  }>("/workspace/information", (route) =>
     fetch(API_URL + route).then((res) => res.json())
   );
 
   const { data, ...project } = useSWR<Project>(
-    active?.project ? `/overall/project/${active.project}/inventory` : null,
+    `/workspace/inventory`,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
@@ -21,14 +21,14 @@ export function useActiveProject() {
   const edgesSet = {};
   const edges: { from: `${string}/${string}`; to: `${string}/${string}` }[] = [];
 
-  data?.applications.forEach(application => {
-    application.services.forEach(service => {
+  data?.modules.forEach(mod => {
+    mod.services.forEach(service => {
       services[service.name] = service;
 
       service?.serviceDependencies?.forEach(dependency => {
-        edgesSet[`${service.application}/${dependency.name}-${dependency.application}/${dependency.name}`] = {
-          to: `${service.application}/${service.name}`,
-          from: `${dependency.application}/${dependency.name}`,
+        edgesSet[`${service.module}/${dependency.name}-${dependency.module}/${dependency.name}`] = {
+          to: `${service.module}/${service.name}`,
+          from: `${dependency.module}/${dependency.name}`,
         }
       })
     })
@@ -40,7 +40,7 @@ export function useActiveProject() {
 
   return {
     ...project,
-    project: data,
+    workspace: data,
     isLoading: isLoadingActive || project.isLoading,
     edges,
     nodes,

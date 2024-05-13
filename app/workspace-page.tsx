@@ -2,7 +2,7 @@ import { Card } from "@/components/card";
 import { ErrorCard } from "@/components/error-card";
 import { Skeleton } from "@/components/skeleton";
 import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
-import type { Application } from "@/types";
+import type { Module } from "@/types";
 import { API_URL } from "@/utils/constants";
 import { Box, Container, GridItem, Icon, Stack } from "@chakra-ui/react";
 import { CodeIcon } from "@radix-ui/react-icons";
@@ -11,15 +11,15 @@ import Link from "next/link";
 import pluralize from "pluralize";
 import useSWR from "swr";
 import { DependencyTree, Tree, type DependencyMap } from "./dependency-graph";
-import { ProjectLogs } from "./project-logs";
-import { useActiveProject } from "./use-active-project";
+import { WorkspaceLogs } from "./workspace-logs";
+import { useActiveWorkspace } from "./use-active-workspace";
 
-export function ProjectPage() {
-  const { project, error, isLoading } = useActiveProject();
+export function WorkspacePage() {
+  const { workspace: workspace, error, isLoading } = useActiveWorkspace();
 
   const { data: dependendyGraphs } = useSWR<{
     graphs: DependencyMap[];
-  }>(project?.name ? `/overall/project/${project?.name}/public-applications-graph` : null,
+  }>(workspace?.name ? `/workspace/public-endpoints-graph` : null,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );
 
@@ -41,7 +41,7 @@ export function ProjectPage() {
                 <Skeleton h="36px" w="100%" maxW="250px" rounded="lg" />
               ) : (
                 <h1 className="font-bold text-[36px]">
-                  {project?.name ?? "Project"}
+                  {workspace?.name ?? "Worksace"}
                 </h1>
               )}
             </div>
@@ -63,23 +63,23 @@ export function ProjectPage() {
             <div
               className={clsx(
                 "grid gap-6 w-full",
-                !isLoading && !project ? "" : "grid-cols-3"
+                !isLoading && !workspace ? "" : "grid-cols-3"
               )}
             >
               {isLoading ? (
                 Array.from(Array(9).keys()).map((idx) => (
                   <GridItem key={idx}>
-                    <ApplicationCard isLoading />
+                    <ModuleCard isLoading />
                   </GridItem>
                 ))
-              ) : !project ? (
+              ) : !workspace ? (
                 <ErrorCard message="Unable to load project" />
-              ) : project.applications.length > 0 ? (
-                project.applications.map((application, idx) => (
+              ) : workspace.modules.length > 0 ? (
+                workspace.modules.map((mod, idx) => (
                   <div key={idx}>
-                    <ApplicationCard
-                      application={application}
-                      projectId={project.name}
+                    <ModuleCard
+                      mod={mod}
+                      projectId={workspace.name}
                     />
                   </div>
                 ))
@@ -89,7 +89,7 @@ export function ProjectPage() {
             </div>
           </TabContent>
           <TabContent value="logs">
-            <ProjectLogs />
+            <WorkspaceLogs />
           </TabContent>
           <TabContent value="graph">
             {dependendyGraphs?.graphs && dependendyGraphs.graphs.length > 0 ? (
@@ -106,12 +106,12 @@ export function ProjectPage() {
   );
 }
 
-const ApplicationCard = ({
-  application,
+const ModuleCard = ({
+  mod,
   projectId,
   isLoading,
 }: {
-  application?: Application;
+  mod?: Module;
   projectId?: string;
   isLoading?: boolean;
 }) => {
@@ -124,18 +124,18 @@ const ApplicationCard = ({
 
           <Skeleton h="16px" w="35%" rounded="base" mt={6} />
         </Stack>
-      ) : application ? (
-        <Link href={`/application?application=${application.name}`}>
+      ) : mod ? (
+        <Link href={`/module?module=${mod.name}`}>
           <Box>
-            <p className="text-lg font-semibold mb-1">{application.name}</p>
+            <p className="text-lg font-semibold mb-1">{mod.name}</p>
             <span className="text-sm">
-              {application.description ?? "No description"}
+              {mod.description ?? "No description"}
             </span>
 
             <div className="flex items-center mt-6 gap-2">
               <Icon as={CodeIcon} />
               <span className="text-sm">
-                {pluralize("service", application.services.length, true)}
+                {pluralize("service", mod.services.length, true)}
               </span>
             </div>
           </Box>
@@ -151,7 +151,7 @@ function transformDependencyGraphs(graphs?: DependencyMap[]): Tree[] {
   }
 
   return graphs.map((graph) => {
-    const root = graph.nodes.find((node) => node.type === "APPLICATION");
+    const root = graph.nodes.find((node) => node.type === "MODULE");
     if (!root) {
       throw new Error("No root found in dependency graph");
     }
