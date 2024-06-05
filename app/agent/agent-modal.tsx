@@ -30,6 +30,7 @@ export function AgentModal({
     fetch(API_URL + route).then((res) => res.json())
   );
 
+
   return (
     <>
       <Dialog
@@ -66,7 +67,7 @@ export function AgentModal({
                     { name: "Protocols", list: agent.protocols },
                     { name: "Capabilities", list: agent.capabilities },
                   ].map((tab) =>
-                    tab.list.length > 0 ? (
+                    tab?.list?.length > 0 ? (
                       <div className="flex flex-col" key={tab.name}>
                         <span className="text-neutral-500 text-sm">
                           {tab.name}

@@ -5,7 +5,7 @@ import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
 import type { Module, ServiceDependencies } from "@/types";
 import { API_URL } from "@/utils/constants";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { AgentModal } from "../agent/agent-modal";
 import { WorkspaceLogs } from "../workspace-logs";
@@ -62,6 +62,14 @@ export function ModuleServices({
   const preview = previewHistory.length
     ? previewHistory?.[previewHistory.length - 1]
     : null;
+
+  console.log('previewHistory', previewHistory)
+  console.log('preview', preview)
+  console.log('module', module)
+
+  // const [ preview, setPreview] = useState();
+
+  // useEffect(() => {}, [])
 
   const undoPreviewHistory =
     previewHistory?.length > 1
@@ -121,7 +129,7 @@ export function ModuleServices({
                 <>
                   <ServiceModal
                     serviceId={preview?.id.split("/")[1]}
-                    applicationId={preview?.id.split("/")[0]}
+                    moduleId={preview?.id.split("/")[0]}
                     previewService={(id) =>
                       setPreviewHistory((prev) => [
                         ...prev,
@@ -135,7 +143,8 @@ export function ModuleServices({
                       ])
                     }
                     undoPreviewHistory={undoPreviewHistory}
-                    open={!!preview && preview.type === "service"}
+                    // open={!!preview && preview.type === "service"}
+                    open={true}
                     onClose={() => setPreviewHistory([])}
                   />
 

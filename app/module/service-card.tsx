@@ -21,6 +21,9 @@ export const ServiceCard = ({
   requiredBy?: `${string}/${string}`[];
 }) => {
 
+    // until we fix the agent info, disable agent info modal
+    const stopSowingAgent = true;
+
   return (
     <Card>
       {loading ? (
@@ -38,10 +41,10 @@ export const ServiceCard = ({
           <div>
             <p className="text-lg font-semibold mb-1">{service.name}</p>
             <span
-              className="underline"
+              className={stopSowingAgent ? "" : "underline"}
               onClick={(event) => {
                 event?.stopPropagation();
-                previewAgent?.(
+                !stopSowingAgent && previewAgent?.(
                   `${service.agent.name}/${service.agent.version}`
                 );
               }}
