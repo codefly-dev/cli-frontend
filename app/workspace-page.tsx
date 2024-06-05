@@ -52,7 +52,7 @@ export function WorkspacePage() {
         <div className="bg-white border-bottom border-neutral-100">
           <div className="pt-10 cli-container">
             <TabList>
-              <Tab value="services">Applications</Tab>
+              <Tab value="services">Modules</Tab>
               <Tab value="logs">Logs</Tab>
               <Tab value="graph">Dependency Graph</Tab>
             </TabList>
