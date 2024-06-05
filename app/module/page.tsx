@@ -7,10 +7,10 @@ import { ModulePage } from "./module-page";
 
 export default function Page() {
   const searchParams = useSearchParams();
-  const applicationId = searchParams?.get("application");
+  const moduleId = searchParams?.get("module");
   // const projectId = searchParams?.get("project");
 
-  if (!applicationId) {
+  if (!moduleId) {
     return (
       <Container maxW="5xl" my={5} h="60vh">
         <ErrorCard message={"Application ID not defined in URL"} />
@@ -18,5 +18,5 @@ export default function Page() {
     );
   }
 
-  return <ModulePage moduleId={applicationId} />;
+  return <ModulePage moduleId={moduleId} />;
 }
