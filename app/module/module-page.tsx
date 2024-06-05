@@ -80,7 +80,7 @@ export function ModuleServices({
         <div className="pt-10 cli-container">
           <div className="flex w-full justify-between items-end">
             <div className="flex flex-col w-full">
-              <BreadcrumbLink href={`/`}>Applications</BreadcrumbLink>
+              <BreadcrumbLink href={`/`}>Modules</BreadcrumbLink>
               {loading ? (
                 <Skeleton h="36px" w="100%" maxW="250px" rounded="lg" />
               ) : (

@@ -26,9 +26,9 @@ export function useActiveWorkspace() {
       services[service.name] = service;
 
       service?.serviceDependencies?.forEach(dependency => {
-        edgesSet[`${service.module}/${dependency.name}-${dependency.module}/${dependency.name}`] = {
-          to: `${service.module}/${service.name}`,
-          from: `${dependency.module}/${dependency.name}`,
+        edgesSet[`${mod.name}/${dependency.name}-${mod.name}/${dependency.name}`] = {
+          to: `${mod.name}/${service.name}`,
+          from: `${mod.name}/${dependency.name}`,
         }
       })
     })
