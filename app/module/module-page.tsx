@@ -5,7 +5,7 @@ import { Tab, TabContent, TabList, Tabs } from "@/components/tabs";
 import type { Module, ServiceDependencies } from "@/types";
 import { API_URL } from "@/utils/constants";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { AgentModal } from "../agent/agent-modal";
 import { WorkspaceLogs } from "../workspace-logs";
@@ -63,6 +63,14 @@ export function ModuleServices({
     ? previewHistory?.[previewHistory.length - 1]
     : null;
 
+  console.log('previewHistory', previewHistory)
+  console.log('preview', preview)
+  console.log('module', module)
+
+  // const [ preview, setPreview] = useState();
+
+  // useEffect(() => {}, [])
+
   const undoPreviewHistory =
     previewHistory?.length > 1
       ? () => {
@@ -80,7 +88,7 @@ export function ModuleServices({
         <div className="pt-10 cli-container">
           <div className="flex w-full justify-between items-end">
             <div className="flex flex-col w-full">
-              <BreadcrumbLink href={`/`}>Applications</BreadcrumbLink>
+              <BreadcrumbLink href={`/`}>Modules</BreadcrumbLink>
               {loading ? (
                 <Skeleton h="36px" w="100%" maxW="250px" rounded="lg" />
               ) : (
@@ -121,7 +129,7 @@ export function ModuleServices({
                 <>
                   <ServiceModal
                     serviceId={preview?.id.split("/")[1]}
-                    applicationId={preview?.id.split("/")[0]}
+                    moduleId={preview?.id.split("/")[0]}
                     previewService={(id) =>
                       setPreviewHistory((prev) => [
                         ...prev,
@@ -135,7 +143,8 @@ export function ModuleServices({
                       ])
                     }
                     undoPreviewHistory={undoPreviewHistory}
-                    open={!!preview && preview.type === "service"}
+                    // open={!!preview && preview.type === "service"}
+                    open={true}
                     onClose={() => setPreviewHistory([])}
                   />
 

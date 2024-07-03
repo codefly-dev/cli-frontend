@@ -15,7 +15,7 @@ SyntaxHighlighter.registerLanguage("protobuf", protobuf);
 SyntaxHighlighter.registerLanguage("markdown", markdown);
 
 export function ServiceModal({
-  applicationId,
+  moduleId,
   serviceId,
   open,
   onClose,
@@ -23,7 +23,7 @@ export function ServiceModal({
   previewAgent,
   undoPreviewHistory,
 }: {
-  applicationId?: string;
+  moduleId?: string;
   serviceId?: string;
   open: boolean;
   onClose(): void;
@@ -33,8 +33,11 @@ export function ServiceModal({
 }) {
   const { workspace, edges } = useActiveWorkspace();
 
-  const service = workspace?.applications
-    ?.find((a) => a.name === applicationId)
+  // until we fix the agent info, disable agent info modal
+  const stopSowingAgent = true;
+
+  const service = workspace?.modules
+    ?.find((m) => m.name === moduleId)
     ?.services?.find((s) => s.name === serviceId);
 
   // const { data: serviceDependencies } = useSWR<ServiceDependencies>(
@@ -43,11 +46,11 @@ export function ServiceModal({
   // );
 
   const dependsOn = edges
-    .filter((edge) => edge.to === `${service?.application}/${service?.name}`)
+    .filter((edge) => edge.to === `${moduleId}/${service?.name}`)
     .map((edge) => edge.from);
 
   const requiredBy = edges
-    .filter((edge) => edge.from === `${service?.application}/${service?.name}`)
+    .filter((edge) => edge.from === `${moduleId}/${service?.name}`)
     .map((edge) => edge.to);
 
   return (
@@ -67,16 +70,16 @@ export function ServiceModal({
               )}
 
               <DialogTitle>
-                {service.application}/{service.name}
+                {moduleId}/{service.name}
               </DialogTitle>
             </div>
 
             <div className="flex flex-col">
               <span
-                className="underline cursor-pointer"
+                className={stopSowingAgent ? "" : "underline cursor-pointer"}
                 onClick={(event) => {
                   event?.stopPropagation();
-                  previewAgent?.(
+                  !stopSowingAgent && previewAgent?.(
                     `${service.agent.name}/${service.agent.version}`
                   );
                 }}
