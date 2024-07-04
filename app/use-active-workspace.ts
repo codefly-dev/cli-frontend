@@ -1,4 +1,4 @@
-import { Project } from "@/types";
+import { Workspace } from "@/types";
 import { API_URL } from "@/utils/constants";
 import useSWR from "swr";
 
@@ -11,7 +11,7 @@ export function useActiveWorkspace() {
     fetch(API_URL + route).then((res) => res.json())
   );
 
-  const { data, ...project } = useSWR<Project>(
+  const { data, ...project } = useSWR<Workspace>(
     `/workspace/inventory`,
     (route) => fetch(API_URL + route).then((res) => res.json())
   );

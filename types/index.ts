@@ -10,6 +10,7 @@ export type RESTEndpoint = {
   module: string;
   service: string;
   namespace: string;
+  api: string;
   apiDetails: {
     rest: {
       openapi: string;
@@ -25,7 +26,8 @@ export type GRPCEndpoint = {
   module: string;
   service: string;
   namespace: string;
-  api: { grpc: { proto: string; rpc: { name: string }[] } };
+  api: string;
+  apiDetails: { grpc: { proto: string; rpc: { name: string }[] } };
 };
 
 export type Endpoint = RESTEndpoint | GRPCEndpoint;
@@ -60,7 +62,7 @@ export type Workspace = {
 
 export type Log = {
   at: string;
-  application: string;
+  module: string;
   service: string;
   kind: "UNKNOWN" | "PLUGIN" | "SERVICE";
   message: string;

@@ -144,12 +144,12 @@ export function ServiceModal({
                         <RestEndpointPreview endpoint={endpoint} />
                       ) : endpoint.name === "grpc" ? (
                         <div className="p-4 mt-3 rounded-xl bg-gray-50 border border-gray-200">
-                          {endpoint.api.grpc.proto ? (
+                          {endpoint.apiDetails.grpc.proto ? (
                             <SyntaxHighlighter
                               language="protobuf"
                               style={docco}
                             >
-                              {atob(endpoint.api.grpc.proto)}
+                              {atob(endpoint.apiDetails.grpc.proto)}
                             </SyntaxHighlighter>
                           ) : (
                             "Unable to load endpoint"

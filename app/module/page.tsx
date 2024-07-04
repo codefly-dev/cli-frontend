@@ -13,7 +13,7 @@ export default function Page() {
   if (!moduleId) {
     return (
       <Container maxW="5xl" my={5} h="60vh">
-        <ErrorCard message={"Application ID not defined in URL"} />
+        <ErrorCard message={"Module ID not defined in URL"} />
       </Container>
     );
   }

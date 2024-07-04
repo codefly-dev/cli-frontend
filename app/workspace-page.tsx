@@ -84,7 +84,7 @@ export function WorkspacePage() {
                   </div>
                 ))
               ) : (
-                <span>No applications found</span>
+                <span>No modules found</span>
               )}
             </div>
           </TabContent>

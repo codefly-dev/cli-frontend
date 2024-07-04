@@ -124,12 +124,12 @@ const PluginUsageCard = ({
               </Flex>
 
               <Flex gap={1}>
-                <Text color={`textMuted.${colorMode}`}>Application:</Text>
+                <Text color={`textMuted.${colorMode}`}>Module:</Text>
                 <Link
-                  href={`/application?project=${usage.project}&application=${usage.application}`}
+                  href={`/module?project=${usage.project}&module=${usage.module}`}
                 >
                   <Text cursor="pointer" textDecor="underline">
-                    {usage.application}
+                    {usage.module}
                   </Text>
                 </Link>
               </Flex>

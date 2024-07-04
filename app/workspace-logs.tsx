@@ -11,7 +11,7 @@ import { useActiveWorkspace } from "./use-active-workspace";
 export function WorkspaceLogs({
   filter,
 }: {
-  filter?: { application?: string };
+  filter?: { module?: string };
 }) {
   const [ws, setWs] = useState<WebSocket | null>(
     new WebSocket(API_URL.replace("http://", "ws://") + "/active/project/logs")
@@ -59,9 +59,9 @@ export function WorkspaceLogs({
 
     let _filteredLogs = logs;
 
-    if (filter?.application) {
+    if (filter?.module) {
       _filteredLogs = _filteredLogs.filter(
-        (log) => log.application === filter.application
+        (log) => log.module === filter.module
       );
     }
 
@@ -193,7 +193,7 @@ export function WorkspaceLogs({
                       overflow="hidden"
                     >
                       {[
-                        ["Application", log.application],
+                        ["Module", log.module],
                         ["Service", log.service],
                         ["Kind", log.kind],
                       ].map(([label, value], idx) => (

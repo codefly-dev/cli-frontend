@@ -93,7 +93,7 @@ export function ModuleServices({
                 <Skeleton h="36px" w="100%" maxW="250px" rounded="lg" />
               ) : (
                 <h1 className="font-bold text-[36px]">
-                  {module?.name ?? "Application"}
+                  {module?.name ?? "Module"}
                 </h1>
               )}
             </div>
@@ -124,7 +124,7 @@ export function ModuleServices({
                   </div>
                 ))
               ) : !module ? (
-                <ErrorCard message="Unable to load application" />
+                <ErrorCard message="Unable to load module" />
               ) : module.services.length > 0 ? (
                 <>
                   <ServiceModal
@@ -200,7 +200,7 @@ export function ModuleServices({
             </div>
           </TabContent>
           <TabContent value="logs">
-            <WorkspaceLogs filter={{ application: module?.name }} />
+            <WorkspaceLogs filter={{ module: module?.name }} />
           </TabContent>
         </div>
       </Tabs>

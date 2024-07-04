@@ -5,7 +5,7 @@ import { useMemo, useRef, useState } from "react";
 export type Tree = {
   id: string;
   value: boolean;
-  type: "ENDPOINT" | "APPLICATION" | "SERVICE";
+  type: "ENDPOINT" | "MODULE" | "SERVICE";
   children: Tree[];
 };
 
