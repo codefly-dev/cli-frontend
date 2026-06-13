@@ -33,3 +33,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated connect-es clients (run `npm run gen`)
+/src/gen
+
+# testing
+/test-results
+/playwright-report
+.idea
