@@ -3,13 +3,17 @@ import { createConnectTransport } from "@connectrpc/connect-web";
 /**
  * Connect transport to the codefly CLI.
  *
- * In production the dashboard is served by the CLI itself, so it talks to the
- * same origin (the CLI mounts the connect-go handler for `codefly.cli.v0.CLI`
- * next to the static file server). In dev (`next dev` on another port) point at
- * the running CLI with NEXT_PUBLIC_CONNECT_URL (defaults to the CLI's web port).
+ * - Production (embedded static export): served BY the CLI, so same origin.
+ * - Dev (`next dev` on :3000): cross-origin to the running CLI — default to the
+ *   CLI's web port so `npm run dev` works with zero config. Override the port /
+ *   workspace with NEXT_PUBLIC_CONNECT_URL (the port is derived from the
+ *   workspace name, so a non-default workspace needs this).
  */
 function baseUrl(): string {
   if (process.env.NEXT_PUBLIC_CONNECT_URL) return process.env.NEXT_PUBLIC_CONNECT_URL;
+  // Dev: window.location.origin is the Next dev server (no CLI API there), so
+  // target the CLI's default web port instead.
+  if (process.env.NODE_ENV === "development") return "http://localhost:10001";
   if (typeof window !== "undefined") return window.location.origin;
   return "http://localhost:10001";
 }
